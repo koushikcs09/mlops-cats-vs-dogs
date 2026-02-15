@@ -1,0 +1,95 @@
+# Release: train model, create GitHub Release with model.pt, optionally upload to Artifactory
+# Trigger: push a tag (e.g. v1.0.0) or run manually (workflow_dispatch)
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      create_github_release:
+        description: "Create GitHub Release and attach model.pt"
+        required: false
+        default: true
+        type: boolean
+      upload_artifactory:
+        description: "Upload model to Artifactory (requires secrets)"
+        required: false
+        default: false
+        type: boolean
+      train_epochs:
+        description: "Training epochs (release tag runs use 5 by default)"
+        required: false
+        default: "5"
+        type: string
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  train_and_release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # for creating release and uploading assets
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install kagglehub
+
+      - name: Download dataset
+        run: PYTHONPATH=. python scripts/download_data.py
+
+      - name: Prepare data (splits)
+        run: PYTHONPATH=. python scripts/prepare_data.py
+
+      - name: Train model
+        run: |
+          EPOCHS="${{ github.event.inputs.train_epochs || '5' }}"
+          if [ "${{ github.event_name }}" = "push" ]; then EPOCHS=5; fi
+          PYTHONPATH=. python scripts/train.py --epochs $EPOCHS --num-workers 2
+
+      - name: Upload model to GitHub Release
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.create_github_release == 'true')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: models/model.pt
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload model to Artifactory
+        if: github.event.inputs.upload_artifactory == 'true' || github.event_name == 'push'
+        env:
+          ARTIFACTORY_URL: ${{ secrets.ARTIFACTORY_URL }}
+          ARTIFACTORY_REPO: ${{ secrets.ARTIFACTORY_REPO }}
+          ARTIFACTORY_PATH: ${{ secrets.ARTIFACTORY_PATH }}
+        run: |
+          if [ -z "$ARTIFACTORY_URL" ]; then
+            echo "ARTIFACTORY_URL not set; skipping Artifactory upload"
+            exit 0
+          fi
+          REPO="${ARTIFACTORY_REPO:-ml-models}"
+          SUBPATH="${ARTIFACTORY_PATH:-cats-vs-dogs/model.pt}"
+          UPLOAD_URL="${ARTIFACTORY_URL%/}/artifactory/${REPO}/${SUBPATH}"
+          echo "Uploading model.pt to Artifactory..."
+          if [ -n "${{ secrets.ARTIFACTORY_API_KEY }}" ]; then
+            curl -f -H "X-JFrog-Art-Api: ${{ secrets.ARTIFACTORY_API_KEY }}" -T models/model.pt "$UPLOAD_URL"
+          elif [ -n "${{ secrets.ARTIFACTORY_USER }}" ] && [ -n "${{ secrets.ARTIFACTORY_PASSWORD }}" ]; then
+            curl -f -u "${{ secrets.ARTIFACTORY_USER }}:${{ secrets.ARTIFACTORY_PASSWORD }}" -T models/model.pt "$UPLOAD_URL"
+          else
+            echo "Set ARTIFACTORY_API_KEY or (ARTIFACTORY_USER + ARTIFACTORY_PASSWORD); skipping"
+            exit 0
+          fi
+          echo "Artifactory upload done. MODEL_URL for app: $UPLOAD_URL"

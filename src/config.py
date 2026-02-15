@@ -18,9 +18,9 @@ TRAIN_RATIO = 0.8
 VAL_RATIO = 0.1
 TEST_RATIO = 0.1
 
-# Training defaults
-DEFAULT_EPOCHS = 3
-DEFAULT_BATCH_SIZE = 32
+# Training defaults (more epochs for better accuracy within assignment spec)
+DEFAULT_EPOCHS = 12
+DEFAULT_BATCH_SIZE = 64  # larger = fewer steps/epoch = faster (if memory allows)
 DEFAULT_LEARNING_RATE = 1e-3
 
 # Model artifact

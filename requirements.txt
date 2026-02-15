@@ -2,6 +2,7 @@
 # Pinned versions for reproducibility
 
 # Core
+urllib3>=1.26,<2  # v2 requires OpenSSL 1.1.1+; macOS often has LibreSSL
 numpy==1.26.4
 Pillow==10.2.0
 scikit-learn==1.4.0

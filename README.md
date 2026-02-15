@@ -80,8 +80,9 @@ The code supports common folder layouts: `train/cats`, `train/dogs`; `training_s
 ## Project Structure
 
 ```
+├── monitoring/               # Optional: Prometheus + Grafana (docker-compose-monitoring.yml)
 ├── api/
-│   └── main.py              # FastAPI: /, /health, /predict, /metrics, /docs
+│   └── main.py              # FastAPI: /, /health, /predict, /metrics (Prometheus), /docs
 ├── src/
 │   ├── config.py            # Paths and constants
 │   ├── data/                # Preprocessing, train/val/test splits
@@ -198,7 +199,12 @@ docker compose up -d
 ## M5: Monitoring & Logging
 
 - **Logging**: Request method, path, status, latency (no sensitive data) in middleware.
-- **Metrics**: `GET /metrics` returns request count and latency (in-app).
+- **Metrics**: `GET /metrics` returns **Prometheus-format** metrics (request count, predictions total, latency, model loaded, uptime) for scraping by Prometheus/Grafana.
+- **Grafana stack**: Optional monitoring with Prometheus + Grafana. From project root:
+  ```bash
+  docker-compose -f monitoring/docker-compose-monitoring.yml up -d
+  ```
+  Then open **Grafana** at http://localhost:3000 (admin/admin). The **Cats vs Dogs API Dashboard** is provisioned automatically; Prometheus scrapes the API at `api:8000/metrics`.
 - **Model performance tracking**: After deployment, collect a batch of predictions and true labels with `scripts/collect_predictions.py` (reads test/val splits and model, writes `predictions_batch.json`).
 
 ## Deliverables

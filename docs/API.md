@@ -68,7 +68,7 @@ curl -X POST http://localhost:8000/predict -F "file=@/path/to/image.jpg"
 
 ### GET /metrics
 
-Returns basic in-app metrics: request count and latency.
+Returns **Prometheus-style** metrics (text/plain) for scraping by Prometheus/Grafana: `app_info`, `app_uptime_seconds`, `model_loaded`, `predictions_total`, `request_count_total`, `prediction_latency_avg_ms`.
 
 **Response:** `200 OK`
 

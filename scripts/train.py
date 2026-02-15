@@ -4,7 +4,11 @@ Logs params, metrics, confusion matrix, and loss curves.
 """
 import argparse
 import json
+import warnings
 from pathlib import Path
+
+# Suppress urllib3 LibreSSL warning on macOS when a dependency uses urllib3 v2
+warnings.filterwarnings("ignore", message="urllib3 v2 only supports OpenSSL", category=UserWarning, module="urllib3")
 
 import mlflow
 import mlflow.pytorch
@@ -28,9 +32,11 @@ from src.data import load_and_resize_image
 from src.model import get_model
 
 # Data augmentation for better generalization (PDF requirement)
+# Added RandomAffine (scale/translate) to improve invariance to pose and framing
 TRAIN_TRANSFORMS = transforms.Compose([
     transforms.RandomHorizontalFlip(p=0.5),
     transforms.RandomRotation(degrees=15),
+    transforms.RandomAffine(degrees=0, translate=(0.05, 0.05), scale=(0.95, 1.05)),
     transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
 ])
 # No augmentation for val/test
@@ -92,6 +98,13 @@ def evaluate(model, loader, device):
 
 
 def main():
+    import sys
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except Exception:
+        pass
+    print("Training starting...", flush=True)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-dir", type=Path, default=DATA_PROCESSED)
     parser.add_argument("--epochs", type=int, default=DEFAULT_EPOCHS)
@@ -99,6 +112,7 @@ def main():
     parser.add_argument("--lr", type=float, default=DEFAULT_LEARNING_RATE)
     parser.add_argument("--out-dir", type=Path, default=MODELS_DIR)
     parser.add_argument("--experiment-name", default="cats_vs_dogs")
+    parser.add_argument("--num-workers", type=int, default=4, help="DataLoader workers (0=main thread only)")
     args = parser.parse_args()
 
     with open(args.data_dir / "splits.json") as f:
@@ -111,16 +125,32 @@ def main():
         )
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    use_cuda = device.type == "cuda"
     train_ds = ImagePathDataset(train_items, IMG_SIZE, transform=TRAIN_TRANSFORMS)
     val_ds = ImagePathDataset(val_items, IMG_SIZE, transform=IDENTITY_TRANSFORM)
     train_loader = DataLoader(
-        train_ds, batch_size=args.batch_size, shuffle=True, num_workers=0
+        train_ds,
+        batch_size=args.batch_size,
+        shuffle=True,
+        num_workers=args.num_workers,
+        pin_memory=use_cuda,
+        persistent_workers=args.num_workers > 0,
     )
-    val_loader = DataLoader(val_ds, batch_size=args.batch_size, shuffle=False)
+    val_loader = DataLoader(
+        val_ds,
+        batch_size=args.batch_size,
+        shuffle=False,
+        num_workers=args.num_workers,
+        pin_memory=use_cuda,
+        persistent_workers=args.num_workers > 0,
+    )
 
     model = get_model(num_classes=2).to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode="min", factor=0.5, patience=2
+    )
 
     mlflow.set_experiment(args.experiment_name)
     with mlflow.start_run():
@@ -135,6 +165,7 @@ def main():
             val_loss, val_acc, val_preds, val_labels = evaluate(
                 model, val_loader, device
             )
+            scheduler.step(val_loss)
             history["train_loss"].append(train_loss)
             history["val_loss"].append(val_loss)
             history["val_acc"].append(val_acc)
@@ -144,7 +175,8 @@ def main():
             )
             print(
                 f"Epoch {epoch+1}/{args.epochs} train_loss={train_loss:.4f} "
-                f"val_loss={val_loss:.4f} val_acc={val_acc:.4f}"
+                f"val_loss={val_loss:.4f} val_acc={val_acc:.4f}",
+                flush=True,
             )
 
         # Confusion matrix
@@ -163,7 +195,7 @@ def main():
         mlflow.pytorch.log_model(model, "model")
         mlflow.log_artifact(str(model_path))
 
-    print(f"Model saved to {model_path}")
+    print(f"Model saved to {model_path}", flush=True)
 
 
 if __name__ == "__main__":
