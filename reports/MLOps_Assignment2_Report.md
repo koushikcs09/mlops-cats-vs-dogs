@@ -74,9 +74,11 @@ DVC is used with a remote (e.g. S3/GCS) for large files; Git holds only `.dvc` p
 
 - **Framework:** FastAPI.
 - **Endpoints:**
+  - `GET /` – Landing page (HTML) with links to `/docs`, `/redoc`, `/openapi.json`, `/health`.
   - `GET /health` – Health check for smoke tests and orchestration.
   - `POST /predict` – Accepts an image file (multipart); returns `label` (cat/dog) and `probabilities` (P(cat), P(dog)).
   - `GET /metrics` – Request count and latency (in-app counters).
+  - Interactive docs: `/docs` (Swagger UI), `/redoc` (ReDoc), `/openapi.json` (OpenAPI schema).
 
 ### 3.2 Environment Specification
 

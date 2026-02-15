@@ -81,7 +81,7 @@ The code supports common folder layouts: `train/cats`, `train/dogs`; `training_s
 
 ```
 ├── api/
-│   └── main.py              # FastAPI: /health, /predict, /metrics
+│   └── main.py              # FastAPI: /, /health, /predict, /metrics, /docs, /redoc
 ├── src/
 │   ├── config.py            # Paths and constants
 │   ├── data/                # Preprocessing, train/val/test splits
@@ -165,7 +165,7 @@ git push origin main
 
 ## M2: Model Packaging & Containerization
 
-- **API**: FastAPI with `GET /health`, `POST /predict` (image file → label + probabilities), `GET /metrics`.
+- **API**: FastAPI with `GET /` (landing + doc links), `GET /health`, `POST /predict` (image file → label + probabilities), `GET /metrics`. Interactive docs: `/docs` (Swagger), `/redoc` (ReDoc).
 - **Environment**: `requirements.txt` with pinned versions.
 - **Docker**: Build and run locally:
 

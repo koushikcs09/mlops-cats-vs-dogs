@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 
 from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 import numpy as np
 
 # Lazy load model to avoid import-time path issues
@@ -25,7 +25,14 @@ def get_model():
     return _model
 
 
-app = FastAPI(title="Cats vs Dogs API", version="1.0.0")
+app = FastAPI(
+    title="Cats vs Dogs API",
+    version="1.0.0",
+    description="Binary image classification (cat vs dog) for pet adoption platform.",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
+)
 
 
 @app.middleware("http")
@@ -42,6 +49,26 @@ async def log_requests(request, call_next):
     # Log without body/headers to avoid sensitive data
     print(f"[LOG] {request.method} {request.url.path} status={response.status_code} latency_ms={latency_ms:.2f} request_count={_REQUEST_COUNT}")
     return response
+
+
+@app.get("/", response_class=HTMLResponse)
+def root():
+    """Landing page with links to API docs."""
+    return """
+    <html>
+    <head><title>Cats vs Dogs API</title></head>
+    <body>
+    <h1>Cats vs Dogs API</h1>
+    <p>Binary image classification for pet adoption platform.</p>
+    <ul>
+    <li><a href="/docs">Swagger UI (/docs)</a></li>
+    <li><a href="/redoc">ReDoc (/redoc)</a></li>
+    <li><a href="/openapi.json">OpenAPI schema (JSON)</a></li>
+    <li><a href="/health">Health check</a></li>
+    </ul>
+    </body>
+    </html>
+    """
 
 
 @app.get("/health")

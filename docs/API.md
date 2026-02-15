@@ -1,11 +1,20 @@
 # Cats vs Dogs – API Documentation
 
-Base URL (local): `http://localhost:8000`  
-Interactive docs: **http://localhost:8000/docs**
+Base URL (local): `http://localhost:8000`
+
+**Docs:** [Swagger UI](/docs) · [ReDoc](/redoc) · [OpenAPI JSON](/openapi.json)
 
 ---
 
 ## Endpoints
+
+### GET /
+
+Landing page (HTML) with links to API docs, health, and OpenAPI schema.
+
+**Example:** Open http://localhost:8000 in a browser.
+
+---
 
 ### GET /health
 
@@ -78,6 +87,11 @@ curl http://localhost:8000/metrics
 
 ---
 
-## OpenAPI / Swagger
+## OpenAPI & docs
 
-Full OpenAPI schema and interactive UI: **http://localhost:8000/docs**
+| URL | Description |
+|-----|-------------|
+| http://localhost:8000 | Landing page with links |
+| http://localhost:8000/docs | Swagger UI (interactive) |
+| http://localhost:8000/redoc | ReDoc (interactive) |
+| http://localhost:8000/openapi.json | OpenAPI 3.0 schema (JSON) |
