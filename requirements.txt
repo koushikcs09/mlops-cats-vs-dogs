@@ -1,0 +1,30 @@
+# MLOps Assignment 2 - Cats vs Dogs
+# Pinned versions for reproducibility
+
+# Core
+numpy==1.26.4
+Pillow==10.2.0
+scikit-learn==1.4.0
+
+# ML
+torch==2.2.0
+torchvision==0.17.0
+
+# Experiment tracking
+mlflow==2.10.2
+
+# API
+fastapi==0.109.2
+uvicorn[standard]==0.27.1
+python-multipart==0.0.9
+
+# Testing
+pytest==7.4.4
+pytest-cov==4.1.0
+httpx==0.26.0
+
+# Optional: dataset download (no Kaggle API key needed)
+# kagglehub>=0.3.13
+
+# Optional: DVC (install separately if using DVC)
+# dvc==3.32.2

@@ -1,0 +1,25 @@
+# DVC pipeline for data and model versioning (M1)
+# Run: dvc repro (after dvc pull for data)
+stages:
+  prepare:
+    cmd: PYTHONPATH=. python scripts/prepare_data.py --data-dir data/raw --out-dir data/processed
+    deps:
+      - scripts/prepare_data.py
+      - src/data/preprocess.py
+      - src/config.py
+    params:
+      - params.yaml
+    outs:
+      - data/processed/splits.json
+
+  train:
+    cmd: PYTHONPATH=. python scripts/train.py --data-dir data/processed --out-dir models
+    deps:
+      - scripts/train.py
+      - src/model/cnn.py
+      - src/data/preprocess.py
+      - data/processed/splits.json
+    params:
+      - params.yaml
+    outs:
+      - models/model.pt

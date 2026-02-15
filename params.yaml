@@ -1,0 +1,11 @@
+# DVC / training parameters
+prepare_data:
+  train_ratio: 0.8
+  val_ratio: 0.1
+  test_ratio: 0.1
+  seed: 42
+
+train:
+  epochs: 3
+  batch_size: 32
+  lr: 0.001

@@ -1,0 +1,20 @@
+# M4: Deployment - Docker Compose for local / VM
+# Usage: docker compose up -d
+# Smoke test: ./scripts/smoke_test.sh
+version: "3.8"
+services:
+  api:
+    build: .
+    image: cats-vs-dogs-api:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount model if built locally (optional; image can contain model)
+      - ./models:/app/models:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
