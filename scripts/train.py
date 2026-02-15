@@ -32,12 +32,15 @@ from src.data import load_and_resize_image
 from src.model import get_model
 
 # Data augmentation for better generalization (PDF requirement)
-# Added RandomAffine (scale/translate) to improve invariance to pose and framing
-TRAIN_TRANSFORMS = transforms.Compose([
+TRAIN_TRANSFORMS_FULL = transforms.Compose([
     transforms.RandomHorizontalFlip(p=0.5),
     transforms.RandomRotation(degrees=15),
     transforms.RandomAffine(degrees=0, translate=(0.05, 0.05), scale=(0.95, 1.05)),
     transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
+])
+# Light augmentation for fast mode (faster, still helps a bit)
+TRAIN_TRANSFORMS_FAST = transforms.Compose([
+    transforms.RandomHorizontalFlip(p=0.5),
 ])
 # No augmentation for val/test
 IDENTITY_TRANSFORM = transforms.Compose([])
@@ -113,12 +116,31 @@ def main():
     parser.add_argument("--out-dir", type=Path, default=MODELS_DIR)
     parser.add_argument("--experiment-name", default="cats_vs_dogs")
     parser.add_argument("--num-workers", type=int, default=4, help="DataLoader workers (0=main thread only)")
+    parser.add_argument("--fast", action="store_true", help="Quick run: 2 epochs, subsample data, light augmentation")
+    parser.add_argument("--max-train-samples", type=int, default=None, help="Cap training samples (for quick runs)")
     args = parser.parse_args()
+
+    # --fast overrides for speed
+    if args.fast:
+        args.epochs = 2
+        if args.max_train_samples is None:
+            args.max_train_samples = 2000
+        args.num_workers = 0  # avoid fork overhead when data is small
+        train_transform = TRAIN_TRANSFORMS_FAST
+        print("Fast mode: 2 epochs, max 2000 train samples, light augmentation", flush=True)
+    else:
+        train_transform = TRAIN_TRANSFORMS_FULL
+        if args.max_train_samples is not None:
+            print(f"Limiting to {args.max_train_samples} train samples", flush=True)
 
     with open(args.data_dir / "splits.json") as f:
         splits = json.load(f)
     train_items = splits["train"]
     val_items = splits["val"]
+    if args.max_train_samples is not None and len(train_items) > args.max_train_samples:
+        import random
+        random.Random(42).shuffle(train_items)
+        train_items = train_items[: args.max_train_samples]
     if not train_items:
         raise FileNotFoundError(
             "No training data. Run prepare_data.py first and ensure data/raw has cats/dogs images."
@@ -126,7 +148,7 @@ def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     use_cuda = device.type == "cuda"
-    train_ds = ImagePathDataset(train_items, IMG_SIZE, transform=TRAIN_TRANSFORMS)
+    train_ds = ImagePathDataset(train_items, IMG_SIZE, transform=train_transform)
     val_ds = ImagePathDataset(val_items, IMG_SIZE, transform=IDENTITY_TRANSFORM)
     train_loader = DataLoader(
         train_ds,
