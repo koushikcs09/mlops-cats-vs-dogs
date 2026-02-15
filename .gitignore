@@ -1,0 +1,6 @@
+__pycache__/
+.env
+mlruns/
+data/raw/
+data/processed/
+*.pyc
