@@ -30,7 +30,7 @@ app = FastAPI(
     version="1.0.0",
     description="Binary image classification (cat vs dog) for pet adoption platform.",
     docs_url="/docs",
-    redoc_url="/redoc",
+    redoc_url=None,  # Disabled; assignment does not require it; use /docs (Swagger) for API docs
     openapi_url="/openapi.json",
 )
 
@@ -62,7 +62,6 @@ def root():
     <p>Binary image classification for pet adoption platform.</p>
     <ul>
     <li><a href="/docs">Swagger UI (/docs)</a></li>
-    <li><a href="/redoc">ReDoc (/redoc)</a></li>
     <li><a href="/openapi.json">OpenAPI schema (JSON)</a></li>
     <li><a href="/health">Health check</a></li>
     </ul>

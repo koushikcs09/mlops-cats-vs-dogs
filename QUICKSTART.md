@@ -57,7 +57,7 @@ curl -X POST http://localhost:8000/predict -F "file=@data/raw/PetImages/Cat/0.jp
 # {"label":"cat","probabilities":{"cat":0.92,"dog":0.08}}
 ```
 
-**Docs:** http://localhost:8000 (landing with links), http://localhost:8000/docs (Swagger), http://localhost:8000/redoc (ReDoc).
+**Docs:** http://localhost:8000 (landing with links), http://localhost:8000/docs (Swagger UI).
 
 ---
 

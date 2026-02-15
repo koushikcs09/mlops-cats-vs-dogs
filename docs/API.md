@@ -2,7 +2,7 @@
 
 Base URL (local): `http://localhost:8000`
 
-**Docs:** [Swagger UI](/docs) · [ReDoc](/redoc) · [OpenAPI JSON](/openapi.json)
+**Docs:** [Swagger UI](/docs) · [OpenAPI JSON](/openapi.json)
 
 ---
 
@@ -93,5 +93,4 @@ curl http://localhost:8000/metrics
 |-----|-------------|
 | http://localhost:8000 | Landing page with links |
 | http://localhost:8000/docs | Swagger UI (interactive) |
-| http://localhost:8000/redoc | ReDoc (interactive) |
 | http://localhost:8000/openapi.json | OpenAPI 3.0 schema (JSON) |
