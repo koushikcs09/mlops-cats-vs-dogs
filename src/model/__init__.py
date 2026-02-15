@@ -1,3 +1,3 @@
-from .cnn import SimpleCNN, get_model
+from .cnn import SimpleCNN, SimpleCNNLegacy, get_model
 
-__all__ = ["SimpleCNN", "get_model"]
+__all__ = ["SimpleCNN", "SimpleCNNLegacy", "get_model"]

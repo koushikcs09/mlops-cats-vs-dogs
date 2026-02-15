@@ -58,12 +58,19 @@ def get_model():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """On startup: ensure model file exists (download from MODEL_URL if set)."""
-    if os.environ.get("MODEL_URL"):
-        try:
-            _ensure_model_file()
-        except Exception as e:
-            print(f"[STARTUP] Model download failed: {e}", flush=True)
+    """On startup: ensure model file exists (download from MODEL_URL if set) and preload model."""
+    try:
+        path = _ensure_model_file()
+        print(f"[STARTUP] Model file ready: {path}", flush=True)
+        # Preload model so first /predict does not block and we fail fast if load fails
+        get_model()
+        print("[STARTUP] Model loaded successfully.", flush=True)
+    except Exception as e:
+        print(f"[STARTUP] Model not available: {e}", flush=True)
+        raise RuntimeError(
+            "Model required at startup. Set MODEL_URL to a URL serving model.pt (e.g. GitHub Release), "
+            "or build the Docker image with models/model.pt included."
+        ) from e
     yield
     # shutdown: nothing to do
 

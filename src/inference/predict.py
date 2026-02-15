@@ -10,13 +10,19 @@ from src.data import load_and_resize_image
 from src.model import get_model
 
 
+def _is_legacy_state_dict(state: Dict[str, torch.Tensor]) -> bool:
+    """True if state_dict is from the older CNN without BatchNorm (features.3, features.6)."""
+    return "features.3.weight" in state and "features.1.weight" not in state
+
+
 def load_model(model_path: Union[str, Path]) -> torch.nn.Module:
-    """Load trained model from .pt file (state_dict)."""
+    """Load trained model from .pt file (state_dict). Supports both BatchNorm and legacy (no-BN) checkpoints."""
     path = Path(model_path)
     if not path.exists():
         raise FileNotFoundError(f"Model not found: {path}")
-    model = get_model(num_classes=len(CLASS_NAMES))
     state = torch.load(path, map_location="cpu", weights_only=True)
+    legacy = _is_legacy_state_dict(state)
+    model = get_model(num_classes=len(CLASS_NAMES), legacy=legacy)
     model.load_state_dict(state)
     model.eval()
     return model
