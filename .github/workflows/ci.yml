@@ -20,11 +20,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
       - name: Run unit tests
         run: pytest tests/ -v
@@ -38,13 +37,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python and install deps (for placeholder model)
+      - name: Set up Python and install only torch (placeholder model)
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          cache: "pip"
+      - run: pip install torch==2.2.0
 
       - name: Create placeholder model for image build
         run: |
