@@ -25,9 +25,45 @@
 | **Full doc index** | [docs/INDEX.md](docs/INDEX.md) |
 | API reference | [docs/API.md](docs/API.md) |
 | Deployment (Docker, K8s, CI/CD, Render) | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) |
+| **View Grafana dashboard locally** | [docs/DEPLOYMENT.md#monitoring-stack-prometheus--grafana](docs/DEPLOYMENT.md#monitoring-stack-prometheus--grafana) |
 | Kubernetes (kind, one-command deploy) | [k8s/README.md](k8s/README.md) |
 | Assignment report | [reports/MLOps_Assignment2_Report.md](reports/MLOps_Assignment2_Report.md) |
 | Verification (runtime evidence) | [VERIFICATION.md](VERIFICATION.md) |
+
+---
+
+## Live API (Render)
+
+The API is deployed on Render. Base URL:
+
+**https://mlops-cats-vs-dogs.onrender.com/**
+
+| Endpoint | URL |
+|----------|-----|
+| Landing | [https://mlops-cats-vs-dogs.onrender.com/](https://mlops-cats-vs-dogs.onrender.com/) |
+| Health | [https://mlops-cats-vs-dogs.onrender.com/health](https://mlops-cats-vs-dogs.onrender.com/health) |
+| Swagger UI | [https://mlops-cats-vs-dogs.onrender.com/docs](https://mlops-cats-vs-dogs.onrender.com/docs) |
+| Predict | `POST https://mlops-cats-vs-dogs.onrender.com/predict` (multipart: `file` = image) |
+| Metrics | [https://mlops-cats-vs-dogs.onrender.com/metrics](https://mlops-cats-vs-dogs.onrender.com/metrics) |
+
+Example: `curl https://mlops-cats-vs-dogs.onrender.com/health`
+
+---
+
+## Grafana dashboard (local)
+
+To run the API with Prometheus and Grafana and view the dashboard locally:
+
+1. Ensure the API image is built and `models/model.pt` exists (or use a placeholder).
+2. Start the monitoring stack from project root:
+   ```bash
+   docker-compose -f monitoring/docker-compose-monitoring.yml up -d
+   ```
+3. Open **Grafana**: http://localhost:3000 (login: `admin` / `admin`). The **Cats vs Dogs API Dashboard** is auto-provisioned (predictions, latency, model status, uptime).
+4. Prometheus: http://localhost:9090. API: http://localhost:8000.
+
+To stop: `docker-compose -f monitoring/docker-compose-monitoring.yml down`.  
+Full details: [docs/DEPLOYMENT.md § Monitoring stack](docs/DEPLOYMENT.md#monitoring-stack-prometheus--grafana).
 
 ---
 

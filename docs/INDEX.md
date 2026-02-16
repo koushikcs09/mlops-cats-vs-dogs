@@ -40,5 +40,6 @@ Use this index to find the right guide for your task. All paths are from the **p
 
 - **I want to run the project locally** → [GETTING_STARTED.md](GETTING_STARTED.md)
 - **I want to deploy to Render** → [DEPLOYMENT.md#render](DEPLOYMENT.md#rendercom-or-other-public-cloud)
+- **I want to see the Grafana dashboard locally** → [DEPLOYMENT.md#monitoring-stack-prometheus--grafana](DEPLOYMENT.md#monitoring-stack-prometheus--grafana)
 - **I want API details** → [API.md](API.md)
 - **I use Kubernetes** → [../k8s/README.md](../k8s/README.md)
