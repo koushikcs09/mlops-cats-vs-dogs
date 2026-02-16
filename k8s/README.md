@@ -2,6 +2,16 @@
 
 Deploy the Cats vs Dogs API to a local Kubernetes cluster (kind, minikube, microk8s) or any K8s cluster.
 
+## One-command deploy (kind)
+
+From project root, with [kind](https://kind.sigs.k8s.io/) installed:
+
+```bash
+./scripts/deploy_k8s.sh
+```
+
+This builds the image, creates a kind cluster (if missing), loads the image, applies `k8s/`, and runs `kubectl port-forward` so the API is at http://localhost:8000. Use `--no-build` to skip the Docker build, or `--no-port-forward` to only deploy.
+
 ## Prerequisites
 
 - `kubectl` installed

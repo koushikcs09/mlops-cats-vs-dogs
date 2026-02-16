@@ -116,8 +116,8 @@ DVC is used with a remote (e.g. S3/GCS) for large files; Git holds only `.dvc` p
 
 ### 5.1 Deployment Target
 
-- **Choice:** Docker Compose (and/or local Kubernetes if desired).
-- **Manifests:** `docker-compose.yml` for local/VM deployment; optional Kubernetes Deployment + Service YAML as in the first assignment.
+- **Choice:** Docker Compose and/or Kubernetes (kind, minikube, microk8s, or any cluster).
+- **Manifests:** `docker-compose.yml` for local/VM; `k8s/deployment.yaml` and `k8s/service.yaml` for Kubernetes. See `k8s/README.md` for build, load, and apply steps.
 
 ### 5.2 CD / GitOps Flow
 
@@ -150,7 +150,7 @@ DVC is used with a remote (e.g. S3/GCS) for large files; Git holds only `.dvc` p
 
 | # | Deliverable | Status |
 |---|-------------|--------|
-| 1 | Zip file: source code, configs (DVC, CI/CD, Docker, deployment manifests), trained model artefact | ✅ |
+| 1 | Zip file: source code, configs (DVC, CI/CD, Docker, docker-compose, k8s manifests), trained model artefact. If too large, share a link. | ✅ |
 | 2 | Screen recording (< 5 min): complete MLOps workflow from code change to deployed model prediction | _Add link_ |
 
 **Repository structure:** See README “Project Structure” and Appendix.
@@ -168,11 +168,14 @@ DVC is used with a remote (e.g. S3/GCS) for large files; Git holds only `.dvc` p
 ├── src/config.py, data/, model/, inference/
 ├── scripts/prepare_data.py, train.py, download_data.py, smoke_test.sh, collect_predictions.py
 ├── tests/test_preprocess.py, test_inference.py
-├── dvc.yaml, params.yaml
+├── k8s/deployment.yaml, service.yaml, README.md
+├── monitoring/docker-compose-monitoring.yml
+├── dvc.yaml, params.yaml, data/raw.dvc
 ├── Dockerfile, docker-compose.yml
-├── .github/workflows/ci.yml, cd.yml
-├── requirements.txt
-├── RUN_STEPS.md, QUICKSTART.md
+├── .github/workflows/ci.yml, cd.yml, release.yml
+├── requirements.txt, pytest.ini
+├── docs/INDEX.md, GETTING_STARTED.md, DEPLOYMENT.md, API.md
+├── RUN_STEPS.md, QUICKSTART.md (redirect to docs), VERIFICATION.md
 ├── reports/MLOps_Assignment2_Report.md
 └── docs/API.md, DEPLOYMENT.md
 ```

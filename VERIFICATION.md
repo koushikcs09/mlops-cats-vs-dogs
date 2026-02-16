@@ -57,12 +57,12 @@ print('Config: IMG_SIZE=(224,224), split 80/10/10, CLASS_NAMES=cat,dog OK')
 
 ```bash
 $ python3 -c "
-from scripts.train import TRAIN_TRANSFORMS
-print('Data augmentation: TRAIN_TRANSFORMS has', len(TRAIN_TRANSFORMS.transforms), 'transforms OK')
+from scripts.train import TRAIN_TRANSFORMS_FULL
+print('Data augmentation: TRAIN_TRANSFORMS_FULL has', len(TRAIN_TRANSFORMS_FULL.transforms), 'transforms OK')
 "
 ```
-**Output:** `Data augmentation: TRAIN_TRANSFORMS has 3 transforms OK`  
-✅ Data augmentation (3 transforms) present and loadable.
+**Output:** `Data augmentation: TRAIN_TRANSFORMS_FULL has 4 transforms OK`  
+✅ Data augmentation (RandomHorizontalFlip, RandomRotation, RandomAffine, ColorJitter) present and loadable.
 
 ---
 
@@ -100,8 +100,8 @@ $ curl -s -X POST http://localhost:8000/predict -F "file=@data/raw/PetImages/Cat
 ```bash
 $ curl -s http://localhost:8000/metrics
 ```
-**Output:** `{"request_count":1,"latency_ms_avg":413.12,"latency_ms_recent":[413.12...]}`  
-✅ Metrics endpoint OK (request count and latency).
+**Output:** Prometheus text format (`# TYPE` / `# HELP` and metric lines, e.g. `request_count_total`, `prediction_latency_avg_ms`).  
+✅ Metrics endpoint OK (request count and latency in Prometheus format).
 
 ---
 
@@ -141,7 +141,7 @@ $ docker stop cats-vs-dogs-api
 | 3 | Dataset: Cats and Dogs from Kaggle | **prepare_data.py** ran on `data/raw/PetImages/Cat`, `PetImages/Dog`; README documents Kaggle |
 | 4 | Pre-process to 224×224 RGB for standard CNNs | **Config check** IMG_SIZE=(224,224); **pytest** `test_load_and_resize_image_returns_correct_shape` and `test_preprocess_image_returns_correct_shape` assert (224,224,3) |
 | 5 | Split train/validation/test (80%/10%/10%) | **prepare_data.py** output: Train: 19998, Val: 2499, Test: 2501 (~80/10/10) |
-| 6 | Data augmentation for better generalization | **Runtime import**: TRAIN_TRANSFORMS has 3 transforms; code: RandomHorizontalFlip, RandomRotation, ColorJitter |
+| 6 | Data augmentation for better generalization | **Runtime import**: TRAIN_TRANSFORMS_FULL (4 transforms); code: RandomHorizontalFlip, RandomRotation, RandomAffine, ColorJitter |
 
 ---
 
@@ -149,7 +149,7 @@ $ docker stop cats-vs-dogs-api
 
 - **224×224 RGB:** `src/config.py` (`IMG_SIZE`), `src/data/preprocess.py` (`load_and_resize_image`), `src/model/cnn.py`.
 - **80/10/10 split:** `src/config.py` (`TRAIN_RATIO`, `VAL_RATIO`, `TEST_RATIO`), `src/data/preprocess.py` (`get_train_val_test_splits`), `scripts/prepare_data.py`.
-- **Data augmentation:** `scripts/train.py` (`TRAIN_TRANSFORMS`: RandomHorizontalFlip, RandomRotation, ColorJitter).
+- **Data augmentation:** `scripts/train.py` (`TRAIN_TRANSFORMS_FULL`: RandomHorizontalFlip, RandomRotation, RandomAffine, ColorJitter).
 - **Docker:** `Dockerfile`, `docker-compose.yml`; image built and run; health, predict, metrics verified via curl and smoke test.
 
 All requirements above were verified by **running the code and Docker** as shown.

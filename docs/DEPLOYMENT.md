@@ -1,6 +1,8 @@
 # Cats vs Dogs – Deployment Guide
 
-This document describes how to run and deploy the Cats vs Dogs inference API.
+How to run and deploy the inference API: local (uvicorn), Docker, Docker Compose, Kubernetes, CI/CD, and cloud (e.g. Render).
+
+**Deploy to Render (quick):** Create a Web Service, set env **`MODEL_URL`** to a public URL for `model.pt` (e.g. [GitHub Release asset](https://github.com/OWNER/REPO/releases)), then deploy. Details: [Render.com](#rendercom-or-other-public-cloud).
 
 ---
 
