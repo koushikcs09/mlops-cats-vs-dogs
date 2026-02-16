@@ -1,5 +1,11 @@
 # MLOps Assignment 2: Cats vs Dogs (Pet Adoption Platform)
 
+[![Release](https://github.com/shahrukhsaba/mlops-cats-vs-dogs/actions/workflows/release.yml/badge.svg)](https://github.com/shahrukhsaba/mlops-cats-vs-dogs/actions/workflows/release.yml)
+[![CI](https://github.com/shahrukhsaba/mlops-cats-vs-dogs/actions/workflows/ci.yml/badge.svg)](https://github.com/shahrukhsaba/mlops-cats-vs-dogs/actions/workflows/ci.yml)
+[![CD](https://github.com/shahrukhsaba/mlops-cats-vs-dogs/actions/workflows/cd.yml/badge.svg)](https://github.com/shahrukhsaba/mlops-cats-vs-dogs/actions/workflows/cd.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://www.docker.com/)
+
 **BITS Pilani - MLOps Assignment 2 (S1-25_AIMLCZG523)**  
 **Use case:** Binary image classification (Cats vs Dogs) for a pet adoption platform.
 
