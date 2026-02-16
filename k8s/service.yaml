@@ -1,0 +1,17 @@
+# M4: Kubernetes Service - exposes the API (ClusterIP for in-cluster; NodePort/LoadBalancer for access)
+apiVersion: v1
+kind: Service
+metadata:
+  name: cats-vs-dogs-api
+  labels:
+    app: cats-vs-dogs-api
+spec:
+  type: ClusterIP
+  # For local access (kind/minikube): use NodePort or run: kubectl port-forward svc/cats-vs-dogs-api 8000:8000
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: cats-vs-dogs-api

@@ -122,20 +122,20 @@ If the repo is configured for anonymous read, that URL can be used directly. Oth
 
 ---
 
-## Kubernetes (optional)
+## Kubernetes
 
-For a Kubernetes deployment (e.g. kind, minikube, or cloud), you can add:
+Manifests are in **`k8s/`**: `deployment.yaml` (Deployment) and `service.yaml` (Service). See **[k8s/README.md](../k8s/README.md)** for full steps.
 
-- A **Deployment** (replicas, image from GHCR, resource limits, liveness/readiness on `/health`).
-- A **Service** (e.g. LoadBalancer or ClusterIP).
+**Local (kind / minikube):**
 
-Example image for the deployment:
-
-```yaml
-image: ghcr.io/<owner>/mlops-cats-vs-dogs:main
+```bash
+docker build -t cats-vs-dogs-api:latest .
+kind load docker-image cats-vs-dogs-api:latest   # or minikube: eval $(minikube docker-env) then build
+kubectl apply -f k8s/
+kubectl port-forward svc/cats-vs-dogs-api 8000:8000
 ```
 
-Model can be provided via a volume (e.g. PVC or ConfigMap for small artifacts) or baked into the image at build time.
+**Cluster with GHCR image:** Set `image` in `k8s/deployment.yaml` to `ghcr.io/<owner>/mlops-cats-vs-dogs:main`, add an `imagePullSecret` for `ghcr.io`, then `kubectl apply -f k8s/`. Details in [k8s/README.md](../k8s/README.md).
 
 ---
 

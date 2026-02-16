@@ -166,6 +166,8 @@ Test again with `curl http://localhost:8000/health` and the predict command from
 Find the container ID: `docker ps`  
 Then: `docker stop <container_id>`
 
+**Alternative – Kubernetes (kind/minikube):** Build the image, load it into your cluster (`kind load docker-image cats-vs-dogs-api:latest` or minikube docker-env), then `kubectl apply -f k8s/` and `kubectl port-forward svc/cats-vs-dogs-api 8000:8000`. See [k8s/README.md](k8s/README.md).
+
 ---
 
 ## Step 11 (optional): Smoke test script

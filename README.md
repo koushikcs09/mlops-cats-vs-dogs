@@ -192,14 +192,17 @@ curl -X POST http://localhost:8000/predict -F "file=@/path/to/cat.jpg"
 
 ## M4: CD Pipeline & Deployment
 
-- **Deployment**: Docker Compose (or use the same image on a VM/Kubernetes). See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
-- **CD** (`.github/workflows/cd.yml`): After CI completes on `main` → **pull image from GHCR** → run container → smoke tests (health + one prediction). Pipeline fails if smoke tests fail.
-- **Local**:
+- **Deployment**: **Docker Compose** or **Kubernetes** (kind/minikube/microk8s). See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+- **Docker Compose**: `docker-compose.yml` (local/VM). **Kubernetes**: `k8s/deployment.yaml` + `k8s/service.yaml`; see [k8s/README.md](k8s/README.md).
+- **CD** (`.github/workflows/cd.yml`): After CI completes on `main` → pull image from GHCR → run container → smoke tests. Pipeline fails if smoke tests fail.
+- **Local (Compose):**
 
 ```bash
 docker compose up -d
 ./scripts/smoke_test.sh http://localhost:8000
 ```
+
+- **Local (Kubernetes, kind/minikube):** Build image, load into cluster, then `kubectl apply -f k8s/` and `kubectl port-forward svc/cats-vs-dogs-api 8000:8000`. See [k8s/README.md](k8s/README.md).
 
 ## M5: Monitoring & Logging
 
@@ -235,9 +238,17 @@ PYTHONPATH=. python scripts/prepare_data.py
 PYTHONPATH=. python scripts/train.py --epochs 3
 
 # 3. Run API (model in models/model.pt)
+# Option A – Docker
 docker build -t cats-vs-dogs-api .
 docker run -p 8000:8000 -v $(pwd)/models:/app/models:ro cats-vs-dogs-api
-# In another terminal:
+
+# Option B – Docker Compose
+docker compose up -d
+
+# Option C – Kubernetes (kind/minikube): build, load image, then kubectl apply -f k8s/
+# See k8s/README.md for full steps.
+
+# In another terminal, test:
 curl http://localhost:8000/health
 curl -X POST http://localhost:8000/predict -F "file=@<path-to-any-cat-or-dog.jpg>"
 ```

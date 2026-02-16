@@ -1,6 +1,6 @@
-# Quick Start: Cats vs Dogs API (Docker)
+# Quick Start: Cats vs Dogs API (Docker & Kubernetes)
 
-Run the inference API locally with Docker. For full step-by-step (venv, data, train), see **[RUN_STEPS.md](RUN_STEPS.md)**.
+Run the inference API locally with Docker, Docker Compose, or Kubernetes. For full step-by-step (venv, data, train), see **[RUN_STEPS.md](RUN_STEPS.md)**.
 
 ---
 
@@ -37,6 +37,25 @@ docker run -d --name cats-vs-dogs-api -p 8000:8000 \
 docker compose up -d
 # API will be at http://localhost:8000
 ```
+
+---
+
+## Option C: Kubernetes (kind / minikube)
+
+Requires a local cluster ([kind](https://kind.sigs.k8s.io/) or [minikube](https://minikube.sigs.k8s.io/)) and `kubectl`.
+
+```bash
+# Build and load image into cluster
+docker build -t cats-vs-dogs-api:latest .
+# kind:   kind load docker-image cats-vs-dogs-api:latest
+# minikube:  eval $(minikube docker-env) && docker build -t cats-vs-dogs-api:latest .
+
+kubectl apply -f k8s/
+kubectl port-forward svc/cats-vs-dogs-api 8000:8000
+# API at http://localhost:8000
+```
+
+Full steps (including GHCR image): **[k8s/README.md](k8s/README.md)**.
 
 ---
 
