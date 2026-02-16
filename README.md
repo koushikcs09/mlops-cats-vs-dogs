@@ -153,14 +153,19 @@ dvc push
 dvc pull
 ```
 
-**Track data and model:**
+**What’s versioned:**
+
+- **`data/raw`** – tracked with `dvc add data/raw` (pointer: `data/raw.dvc`). Commit this file so the dataset is versioned.
+- **`data/processed`** and **`models/model.pt`** – tracked by the pipeline in `dvc.yaml` (outputs of `prepare` and `train`). Run `dvc repro` to update `dvc.lock` and outputs.
+
+**Commit DVC metadata (after `dvc init` and `dvc add data/raw`):**
 
 ```bash
-dvc add data/raw data/processed
-dvc add models/model.pt
-git add data/raw.dvc data/processed.dvc models/model.pt.dvc dvc.lock
-git commit -m "Track data and model with DVC"
-dvc push
+git add .dvc data/.gitignore data/raw.dvc dvc.yaml dvc.lock params.yaml
+git commit -m "Track data with DVC (data/raw); pipeline tracks processed data and model"
+# Optional: add a remote and push large files
+# dvc remote add myremote s3://your-bucket/dvc-store
+# dvc push
 git push origin main
 ```
 

@@ -27,5 +27,5 @@ httpx==0.26.0
 # Optional: dataset download (no Kaggle API key needed)
 # kagglehub>=0.3.13
 
-# Optional: DVC (install separately if using DVC)
-# dvc==3.32.2
+# DVC (data/model versioning - M1)
+dvc>=3.32.0
