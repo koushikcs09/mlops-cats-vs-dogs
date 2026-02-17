@@ -91,7 +91,7 @@ $ curl -s http://localhost:8000/health
 
 **Predict (Cat image):**
 ```bash
-$ curl -s -X POST http://localhost:8000/predict -F "file=@data/raw/PetImages/Cat/0.jpg"
+$ curl -s -X POST http://localhost:8000/predict -F "file=@data/raw/Cat/0.jpg"
 ```
 **Output:** `{"label":"dog","probabilities":{"cat":0.4947,"dog":0.5053}}`  
 ✅ Predict endpoint accepts image and returns label + probabilities.

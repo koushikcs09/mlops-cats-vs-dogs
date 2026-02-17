@@ -94,7 +94,7 @@ PYTHONPATH=. python -m uvicorn api.main:app --host 0.0.0.0 --port 8000
 Leave this terminal open. In another terminal:
 ```bash
 curl http://localhost:8000/health
-curl -X POST http://localhost:8000/predict -F "file=@data/raw/PetImages/Cat/0.jpg"
+curl -X POST http://localhost:8000/predict -F "file=@data/raw/Cat/0.jpg"
 ```
 
 ### Option B – Docker
